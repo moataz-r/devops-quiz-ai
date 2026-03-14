@@ -108,3 +108,5 @@ jobs:
             exit 1
           fi
           echo "✅ Deploy triggered successfully"
+
+#I had to update token permissions
