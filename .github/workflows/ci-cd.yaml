@@ -62,16 +62,22 @@ jobs:
             $IMAGE_NAME:latest
 
           # Give gunicorn a moment to start
-          sleep 4
+          sleep 5
 
-          # Assert /health returns HTTP 200
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/health)
+          # Assert /api/health returns "ok" (Checking both status and content)
+          RESPONSE=$(curl -s http://localhost:5000/api/health)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health)
+          
           echo "Health check status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
+          echo "Response body: $RESPONSE"
+
+          if [ "$STATUS" != "200" ] || [[ "$RESPONSE" != *"ok"* ]]; then
             echo "❌ Health check failed!"
             docker logs test-container
+            docker stop test-container
             exit 1
           fi
+
           echo "✅ Health check passed"
           docker stop test-container
 
